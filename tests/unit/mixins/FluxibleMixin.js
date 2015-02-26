@@ -41,6 +41,79 @@ describe('StoreListenerMixin', function () {
         delete global.navigator;
     });
 
+    describe('getChildContext', function(){
+        it('should return the context', function (done) {
+            var Component = React.createClass({
+                mixins: [FluxibleMixin],
+                statics: {
+                    storeListeners: [MockStore]
+                },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
+                },
+                onChange: function () {
+                    done();
+                },
+                render: function () { return null; }
+            });
+            var Element = React.createFactory(Component);
+            var component = ReactTestUtils.renderIntoDocument(Element({context: context}));
+            var childContext = component.getChildContext();
+            expect(childContext).to.exist;
+            expect(childContext).to.be.an.instanceOf(MockContext);
+            expect(childContext.getStore).to.be.an('function');
+            expect(childContext.executeAction).to.be.an('function');
+            mockStore.emitChange();
+        });
+        it('should propagate the context to child components', function (done) {
+            var childContext1, childContext2;
+            var ChildComponent1 = React.createClass({
+                mixins: [FluxibleMixin],
+                componentDidMount: function(){
+                    childContext1 = this.getChildContext();
+                },
+                render: function () { return null; }
+            });
+            var ChildComponent2 = React.createClass({
+                mixins: [FluxibleMixin],
+                componentDidMount: function(){
+                    childContext2 = this.getChildContext();
+                },
+                render: function () {
+                    var child = React.createFactory(ChildComponent1);
+                    return child();
+                }
+            });
+            var ParentComponent = React.createClass({
+                mixins: [FluxibleMixin],
+                statics: {
+                    storeListeners: [MockStore]
+                },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
+                },
+                onChange: function () {
+                    done();
+                },
+                render: function () {
+                    var child = React.createFactory(ChildComponent2);
+                    return child();
+                }
+            });
+            var Element = React.createFactory(ParentComponent);
+            var component = ReactTestUtils.renderIntoDocument(Element({context: context}));
+            expect(childContext1).to.exist;
+            expect(childContext1.getStore).to.be.an('function');
+            expect(childContext1.executeAction).to.be.an('function');
+            expect(childContext2).to.exist;
+            expect(childContext2.getStore).to.be.an('function');
+            expect(childContext2.executeAction).to.be.an('function');
+            mockStore.emitChange();
+        });
+    });
+
     describe('componentDidMount', function () {
         it('should create an listeners array on start', function () {
             expect(FluxibleMixin.listeners).to.not.exist;
@@ -53,6 +126,10 @@ describe('StoreListenerMixin', function () {
                 mixins: [FluxibleMixin],
                 statics: {
                     storeListeners: [MockStore]
+                },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
                 },
                 onChange: function () {
                     done();
@@ -72,6 +149,10 @@ describe('StoreListenerMixin', function () {
                         'onChange2': MockStore
                     }
                 },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
+                },
                 onChange2: function () {
                     done();
                 },
@@ -89,6 +170,10 @@ describe('StoreListenerMixin', function () {
                     storeListeners: {
                         'onChange2': [MockStore]
                     }
+                },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
                 },
                 onChange2: function () {
                     done();
@@ -109,6 +194,10 @@ describe('StoreListenerMixin', function () {
                 statics: {
                     storeListeners: [MockStore, MockStore2]
                 },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
+                },
                 onChange: function () {
                 },
                 render: function () { return null; }
@@ -126,6 +215,10 @@ describe('StoreListenerMixin', function () {
                         'onChange2': MockStore,
                         'onChange3': MockStore2
                     }
+                },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
                 },
                 onChange2: function () {
                 },
@@ -145,6 +238,10 @@ describe('StoreListenerMixin', function () {
                     storeListeners: {
                         'onChange2': [MockStore, MockStore2]
                     }
+                },
+                childContextTypes: {
+                   dispatcher: React.PropTypes.object,
+                   executeActionCalls: React.PropTypes.array
                 },
                 onChange2: function () {
                 },
@@ -192,6 +289,10 @@ describe('StoreListenerMixin', function () {
         it('should call context executeAction when context provided', function () {
             var Component = React.createClass({
                     mixins: [FluxibleMixin],
+                    childContextTypes: {
+                       dispatcher: React.PropTypes.object,
+                       executeActionCalls: React.PropTypes.array
+                    },
                     getInitialState: function () {
                         this.executeAction(function () {},2,function(){});
                         return {};

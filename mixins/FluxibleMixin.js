@@ -42,6 +42,20 @@ var FluxibleMixin = {
         getStore: React.PropTypes.func,
         executeAction: React.PropTypes.func
     },
+
+    childContextTypes: {
+       getStore: React.PropTypes.func,
+       executeAction: React.PropTypes.func
+    },
+
+    /**
+     * Provides the current context as a child context
+     * @method getChildContext
+     */
+    getChildContext: function(){
+       return this.props.context || this.context;
+    },
+
     /**
      * Registers staticly declared listeners
      * @method componentDidMount
