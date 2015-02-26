@@ -44,16 +44,20 @@ var FluxibleMixin = {
     },
 
     childContextTypes: {
-       getStore: React.PropTypes.func,
-       executeAction: React.PropTypes.func
+        getStore: React.PropTypes.func,
+        executeAction: React.PropTypes.func
     },
 
     /**
      * Provides the current context as a child context
      * @method getChildContext
      */
-    getChildContext: function(){
-       return this.props.context || this.context;
+    getChildContext: function() {
+        var context = {};
+        Object.keys(FluxibleMixin.childContextTypes).forEach(function (key) {
+            context[key] = (this.props.context && this.props.context[key]) || this.context[key];
+        }, this);
+        return context;
     },
 
     /**
