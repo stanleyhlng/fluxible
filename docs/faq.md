@@ -32,10 +32,6 @@ It is not required because we still support passing `context` as a prop to all o
 
 ## Stores
 
-### Why do the stores need to "clear" in `initialize` if the dispatcher and stores are `new`'d?
-
-They are not clearing, just setting initial state. It is good to initial properties in the constructor/initialize for v8 optimization (even if that means setting it to `null`).
-
 ### Can I call an action from a store?
 
 Right now, it is not possible. This will require some thought on how to ensure that the server can keep track of actions that are executed from stores.
@@ -56,7 +52,7 @@ This is caused by the csrf middleware. You need to make sure you pass the `csrf`
 
 ### Which should I use, `react-router` or `flux-router-component`?
 
-[react-router](https://github.com/rackt/react-router) has some features that flux-router-component does not have, like nested routes, component `willTransitionTo` hooks, and built-in re-directs. If you feel like you do not need them, then you will be fine with flux-router-component. We prefer the flux-like flow as you mentioned, so we use flux-router-component internally.
+[react-router](https://github.com/rackt/react-router) has some features that flux-router-component does not have, like nested routes, component `willTransitionTo` hooks, and built-in re-directs. If you feel like you do not need them, then you will be fine with flux-router-component. We prefer the flux-like flow, so we use flux-router-component internally.
 
 
 ### In react-router, how do I get access to the Fluxible context from `willTransitionTo`?
